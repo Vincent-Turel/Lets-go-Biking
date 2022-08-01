@@ -60,6 +60,10 @@ function printItinerary() {
             layers.push(vector);
             map.addLayer(vector);
         }
+        map.setView(new ol.View({
+            center: ol.proj.fromLonLat(responseObject[0]['features'][0]['geometry']['coordinates'][0]),
+            zoom: 14
+        }));
         showInstructions(responseObject);
     }
 }

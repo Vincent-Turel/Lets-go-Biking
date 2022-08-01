@@ -44,7 +44,7 @@ namespace HeavyClient
                 }
 
                 Console.WriteLine("\n ------- TESTS ARE OVER -------");
-            }      
+            } 
         }
     }
 }

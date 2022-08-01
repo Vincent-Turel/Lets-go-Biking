@@ -19,8 +19,7 @@ namespace Router
         private Finder() {}
 
         public static Finder GetInstance() => _instance ??= new Finder();
-
-
+        
         public async Task<JArray> FindPathway(string start, string end)
         {
             Console.WriteLine("Finding pathway from {0} to {1}", start, end);
@@ -123,9 +122,18 @@ namespace Router
         private async Task<(Station, JObject)> GetClosestStation(MyGeoCoordinate coordinate, bool start = true)
         {
             Console.WriteLine("Looking for the closest station from the point : " + coordinate);
+            // Récupère les stations (stockés indéfiniment dans le cache) et les tris par distance à notre point
+            // par distance à vol d'oiseau
             Station[] stations = (await GetAllStationAsync())
                 .OrderBy(s => coordinate.GetDistanceTo(s.position.ToGeoCoordinate())).ToArray();
 
+            // Itère sur toute les stations et les traite 5 par 5.
+            // Parmis ces 5 stations, élimine celles qui ne possède pas de vélo (resp. qui ne contient aucune place libre)
+            // dans la station de départ (resp. d'arrivée) et élimine les stations du contrat jcdecauxbike (contrat fictif de test)
+            // Tri les stations restantes par distance à pied 
+            // Retourne la plus proche
+            // Si les 5 stations ont été éliminés, refait la même chose avec les 5 suivantes et ce jusqu'à ce qu'une station soit séléctionnée
+            // ou qu'aucune des 2500 ne soit convenable.
             for (var i = 0; i < stations.Length; i += 5)
             {
                 var station = (await Task.WhenAll(stations.Skip(i).Take(5)
